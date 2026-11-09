@@ -29,6 +29,12 @@ public class ProductoDAOImpl implements ProductoDAO {
             "UPDATE Producto SET cantidadDisponible = cantidadDisponible - ? "
                     + "WHERE idProducto = ? AND cantidadDisponible >= ?";
 
+    private static final String SQL_AUMENTAR_CANTIDAD =
+            "UPDATE Producto SET cantidadDisponible = cantidadDisponible + ? WHERE idProducto = ?";
+
+    private static final String SQL_FIJAR_CANTIDAD =
+            "UPDATE Producto SET cantidadDisponible = ? WHERE idProducto = ?";
+
     private final JdbcTemplate jdbcTemplate;
 
     public ProductoDAOImpl(JdbcTemplate jdbcTemplate) {
@@ -62,6 +68,16 @@ public class ProductoDAOImpl implements ProductoDAO {
     public boolean descontarCantidad(int idProducto, int cantidad) {
         int filasActualizadas = jdbcTemplate.update(SQL_DESCONTAR_CANTIDAD, cantidad, idProducto, cantidad);
         return filasActualizadas == 1;
+    }
+
+    @Override
+    public boolean aumentarCantidad(int idProducto, int cantidad) {
+        return jdbcTemplate.update(SQL_AUMENTAR_CANTIDAD, cantidad, idProducto) == 1;
+    }
+
+    @Override
+    public boolean fijarCantidad(int idProducto, int cantidad) {
+        return jdbcTemplate.update(SQL_FIJAR_CANTIDAD, cantidad, idProducto) == 1;
     }
 
     // Convierte una fila de la tabla Producto en un objeto Producto

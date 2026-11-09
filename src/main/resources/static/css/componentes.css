@@ -152,7 +152,7 @@
 
 /* Mientras se escribe en un campo, el menú inferior se oculta para no tapar el teclado ni la lista */
 @media (max-width: 47.99rem) {
-    body:has(input:focus, select:focus) .menu {
+    body:has(input:focus, select:focus, textarea:focus) .menu {
         display: none;
     }
 }
@@ -249,7 +249,8 @@ input[type="text"],
 input[type="password"],
 input[type="number"],
 input[type="search"],
-select {
+select,
+textarea {
     width: 100%;
     min-height: var(--alto-control);
     padding: 0 0.875rem;
@@ -260,7 +261,13 @@ select {
     font: inherit;
 }
 
-input[aria-invalid="true"] {
+textarea {
+    padding: 0.75rem 0.875rem;
+    resize: vertical;
+}
+
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
     border-color: var(--color-error);
     border-width: 3px;
 }
@@ -539,8 +546,17 @@ input[aria-invalid="true"] {
     font-variant-numeric: tabular-nums;
 }
 
-.producto-accion {
+/* Botones del propietario: Cambiar precio (CUS03) y Cambiar cantidad (CUS07) */
+.producto-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     width: 100%;
+}
+
+.producto-acciones .boton {
+    flex: 1 1 9rem;
+    padding: 0 0.75rem;
 }
 
 /* ---------- Tablas (confirmación e historial) ---------- */
@@ -606,6 +622,42 @@ input[aria-invalid="true"] {
     list-style: none;
 }
 
+/* Venta anulada (CUS08): se indica con texto, no solo con el color */
+.etiqueta-anulada {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.125rem 0.625rem;
+    border: var(--grosor-borde) solid var(--color-error);
+    border-radius: 999px;
+    background: var(--color-error-fondo);
+    color: var(--color-error);
+    font-size: var(--texto-pequeno);
+    vertical-align: middle;
+}
+
+.anulacion {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-error-fondo);
+    border: var(--grosor-borde) dashed var(--color-error);
+}
+
+.anulacion p {
+    margin: 0;
+}
+
+.anulacion p + p {
+    margin-top: 0.375rem;
+}
+
+.venta-anulada .total {
+    background: var(--color-texto-tenue);
+}
+
+.venta-anular {
+    margin-top: 1rem;
+}
+
 /* ---------- Pantallas más anchas (tablet o computadora) ---------- */
 
 @media (min-width: 40rem) {
@@ -619,8 +671,13 @@ input[aria-invalid="true"] {
         text-align: right;
     }
 
-    .producto-accion {
+    .producto-acciones {
         width: auto;
+        flex-wrap: nowrap;
+    }
+
+    .producto-acciones .boton {
+        flex: 0 0 auto;
     }
 
     .acciones {

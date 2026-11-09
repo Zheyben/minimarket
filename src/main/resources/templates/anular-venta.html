@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS08 Anular la última venta (exclusivo del propietario) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Anular venta')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('historial')}"></th:block>
+
+<main id="contenido" class="contenedor contenedor-estrecho" tabindex="-1">
+    <h1>Anular venta N.° <span th:text="${venta.idVenta}">1</span></h1>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <p class="aviso">
+        Al anular la venta, sus unidades vuelven al inventario y la venta queda en el historial
+        marcada como anulada, con la fecha y el motivo. Esta acción no se puede deshacer.
+    </p>
+
+    <p class="texto-secundario">
+        Fecha y hora:
+        <time th:datetime="${venta.fechaHora}"
+              th:text="${#temporals.format(venta.fechaHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</time>
+    </p>
+
+    <div class="tabla-contenedor">
+        <table class="tabla">
+            <caption class="solo-lector">Productos de la venta que se va a anular</caption>
+            <thead>
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col" class="numero">Cantidad</th>
+                <th scope="col" class="numero">Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="detalle : ${venta.productos}">
+                <td th:text="${detalle.nombreProducto}">Producto</td>
+                <td class="numero" th:text="${detalle.cantidad}">1</td>
+                <td class="numero">
+                    <span th:replace="~{fragmentos/plantilla :: soles(${detalle.subtotal})}"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="total total-pequeno">
+        <span>Total</span>
+        <span th:replace="~{fragmentos/plantilla :: soles(${venta.total})}"></span>
+    </p>
+
+    <form method="post" class="formulario" th:action="@{/ventas/{id}/anular(id=${venta.idVenta})}">
+        <div class="campo">
+            <label for="motivo">Motivo de la anulación</label>
+            <p id="ayuda-motivo" class="ayuda">Explica qué pasó. Ejemplo: se registró 2 veces el arroz.</p>
+            <textarea id="motivo" name="motivo" rows="3" maxlength="200" required
+                      th:text="${motivo}"
+                      th:aria-describedby="${error} ? 'ayuda-motivo mensaje-error' : 'ayuda-motivo'"
+                      th:aria-invalid="${error} ? 'true'"></textarea>
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="boton boton-quitar">Anular venta</button>
+            <a th:href="@{/ventas/historial}" class="boton boton-secundario">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

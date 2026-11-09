@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<!-- Vista: CUS02 Consultar catálogo de productos (el propietario además accede a CUS03) -->
+<!-- Vista: CUS02 Consultar catálogo de productos (el propietario además accede a CUS03 y CUS07) -->
 <head th:replace="~{fragmentos/plantilla :: cabeza('Catálogo de productos')}"></head>
 <body>
 <th:block th:replace="~{fragmentos/plantilla :: cabecera('catalogo')}"></th:block>
@@ -42,11 +42,15 @@
                 <span class="solo-lector">Precio:</span>
                 <span th:replace="~{fragmentos/plantilla :: soles(${producto.precio})}"></span>
             </p>
-            <!-- CUS03: solo el propietario ve esta opción -->
-            <a class="boton boton-secundario producto-accion"
-               th:if="${usuarioActual?.esPropietario()}"
-               th:href="@{/productos/{id}/precio(id=${producto.idProducto})}"
-               th:aria-label="|Cambiar precio de ${producto.nombre}|">Cambiar precio</a>
+            <!-- CUS03 y CUS07: solo el propietario ve estas opciones -->
+            <div class="producto-acciones" th:if="${usuarioActual?.esPropietario()}">
+                <a class="boton boton-secundario"
+                   th:href="@{/productos/{id}/precio(id=${producto.idProducto})}"
+                   th:aria-label="|Cambiar precio de ${producto.nombre}|">Cambiar precio</a>
+                <a class="boton boton-secundario"
+                   th:href="@{/productos/{id}/cantidad(id=${producto.idProducto})}"
+                   th:aria-label="|Cambiar cantidad de ${producto.nombre}|">Cambiar cantidad</a>
+            </div>
         </li>
     </ul>
 </main>

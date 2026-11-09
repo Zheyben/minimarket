@@ -5,7 +5,7 @@ Prototipo desarrollado para el Proyecto Final del curso **Análisis y diseño de
 - Iniciar sesión con el rol de **vendedor** o de **propietario**.
 - Consultar el catálogo y buscar productos con su precio y cantidad disponible.
 - Registrar ventas: calcula el total con los precios guardados y descuenta el inventario.
-- Cambiar precios y ver el historial de ventas (solo el propietario).
+- Solo el propietario: cambiar precios, sumar la mercadería que llega o corregir cantidades, ver el historial de ventas y anular la última venta (queda registrada con su motivo).
 
 Está organizado con los patrones **MVC, DAO y Capas** y se conecta a una base de datos **MySQL**.
 
@@ -21,7 +21,7 @@ Está organizado con los patrones **MVC, DAO y Capas** y se conecta a una base d
 - En MySQL Workbench: *File → Open SQL Script*, elige el archivo y pulsa el rayo (*Execute*).
 - O desde CMD, en la carpeta `code/scripts` (si `mysql` está en el PATH): `mysql -u root -p < minimarket_aj.sql`
 
-> Si la base ya existe, elimínala antes con `DROP DATABASE minimarket_aj;` y vuelve a ejecutar el script.
+> Si la base ya existe (por ejemplo, creada con una versión anterior del script), elimínala antes con `DROP DATABASE minimarket_aj;` y vuelve a ejecutar el script.
 
 **2. Configurar la conexión.** En `src/main/resources/application.properties`, cambia el usuario y la contraseña por los de tu MySQL:
 

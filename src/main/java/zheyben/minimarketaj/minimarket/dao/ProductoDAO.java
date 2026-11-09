@@ -20,4 +20,12 @@ public interface ProductoDAO {
 
     // Resta unidades solo si hay suficientes. Devuelve true si el descuento se realizó
     boolean descontarCantidad(int idProducto, int cantidad);
+
+    // Suma unidades a la cantidad disponible (mercadería que llegó o venta anulada).
+    // Devuelve true si el producto existe y se actualizó
+    boolean aumentarCantidad(int idProducto, int cantidad);
+
+    // Reemplaza la cantidad disponible por la cantidad contada en la tienda.
+    // Devuelve true si el producto existe y se actualizó
+    boolean fijarCantidad(int idProducto, int cantidad);
 }

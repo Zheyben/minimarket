@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<!-- Vista: CUS06 Consultar historial de ventas (exclusivo del propietario) -->
+<!-- Vista: CUS06 Consultar historial de ventas (exclusivo del propietario).
+     Desde aquí el propietario también puede anular la última venta (CUS08). -->
 <head th:replace="~{fragmentos/plantilla :: cabeza('Historial de ventas')}"></head>
 <body>
 <th:block th:replace="~{fragmentos/plantilla :: cabecera('historial')}"></th:block>
@@ -8,16 +9,32 @@
 <main id="contenido" class="contenedor" tabindex="-1">
     <h1>Historial de ventas</h1>
 
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
     <p class="aviso" th:if="${#lists.isEmpty(ventas)}">Todavía no hay ventas registradas.</p>
 
     <ul class="lista-ventas" th:unless="${#lists.isEmpty(ventas)}">
-        <li class="tarjeta venta" th:each="venta : ${ventas}">
-            <h2>Venta N.° <span th:text="${venta.idVenta}">1</span></h2>
+        <li class="tarjeta venta" th:each="venta : ${ventas}" th:classappend="${venta.estaAnulada()} ? 'venta-anulada'">
+            <h2>
+                Venta N.° <span th:text="${venta.idVenta}">1</span>
+                <span class="etiqueta-anulada" th:if="${venta.estaAnulada()}">Anulada</span>
+            </h2>
             <p class="texto-secundario">
                 Fecha y hora:
                 <time th:datetime="${venta.fechaHora}"
                       th:text="${#temporals.format(venta.fechaHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</time>
             </p>
+
+            <!-- Registro de la anulación: cuándo y por qué se anuló (CUS08) -->
+            <div class="anulacion" th:if="${venta.estaAnulada()}">
+                <p>
+                    <strong>Anulada el</strong>
+                    <time th:datetime="${venta.fechaAnulacion}"
+                          th:text="${#temporals.format(venta.fechaAnulacion, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:05</time>.
+                    Sus unidades volvieron al inventario.
+                </p>
+                <p><strong>Motivo:</strong> <span th:text="${venta.motivoAnulacion}">Motivo</span></p>
+            </div>
 
             <div class="tabla-contenedor">
                 <table class="tabla">
@@ -42,9 +59,14 @@
             </div>
 
             <p class="total total-pequeno">
-                <span>Total</span>
+                <span th:text="${venta.estaAnulada()} ? 'Total (anulado)' : 'Total'">Total</span>
                 <span th:replace="~{fragmentos/plantilla :: soles(${venta.total})}"></span>
             </p>
+
+            <!-- CUS08: solo la última venta registrada se puede anular -->
+            <a class="boton boton-quitar boton-bloque venta-anular" th:if="${venta.anulable()}"
+               th:href="@{/ventas/{id}/anular(id=${venta.idVenta})}"
+               th:aria-label="|Anular la venta N.° ${venta.idVenta}|">Anular venta</a>
         </li>
     </ul>
 </main>

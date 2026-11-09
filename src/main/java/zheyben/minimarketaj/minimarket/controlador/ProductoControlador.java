@@ -10,23 +10,27 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import zheyben.minimarketaj.minimarket.excepcion.DatosInvalidosException;
 import zheyben.minimarketaj.minimarket.excepcion.ProductoNoEncontradoException;
 import zheyben.minimarketaj.minimarket.modelo.Producto;
+import zheyben.minimarketaj.minimarket.servicio.InventarioServicio;
 import zheyben.minimarketaj.minimarket.servicio.ProductoServicio;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-// Controlador: CUS02 Consultar catálogo de productos y CUS03 Actualizar precios
+// Controlador: CUS02 Consultar catálogo de productos, CUS03 Actualizar precios y CUS07 Actualizar cantidades
 @Controller
 public class ProductoControlador {
 
     private static final String VISTA_CATALOGO = "catalogo";
     private static final String VISTA_EDITAR_PRECIO = "editar-precio";
+    private static final String VISTA_EDITAR_CANTIDAD = "editar-cantidad";
     private static final String REDIRECCION_CATALOGO = "redirect:/catalogo";
 
     private final ProductoServicio productoServicio;
+    private final InventarioServicio inventarioServicio;
 
-    public ProductoControlador(ProductoServicio productoServicio) {
+    public ProductoControlador(ProductoServicio productoServicio, InventarioServicio inventarioServicio) {
         this.productoServicio = productoServicio;
+        this.inventarioServicio = inventarioServicio;
     }
 
     @GetMapping("/")
@@ -71,6 +75,67 @@ public class ProductoControlador {
         } catch (ProductoNoEncontradoException error) {
             return volverAlCatalogoConError(atributos, error);
         }
+    }
+
+    // CUS07, pasos 2 y 3: muestra la cantidad disponible y las dos formas de actualizarla
+    @GetMapping("/productos/{idProducto}/cantidad")
+    public String mostrarEdicionCantidad(@PathVariable int idProducto, Model modelo,
+                                         RedirectAttributes atributos) {
+        try {
+            modelo.addAttribute("producto", productoServicio.obtenerProducto(idProducto));
+            return VISTA_EDITAR_CANTIDAD;
+        } catch (ProductoNoEncontradoException error) {
+            return volverAlCatalogoConError(atributos, error);
+        }
+    }
+
+    // CUS07, pasos 4 y 5: suma las unidades de la mercadería que llegó
+    @PostMapping("/productos/{idProducto}/cantidad/ingreso")
+    public String registrarIngreso(@PathVariable int idProducto,
+                                   @RequestParam(required = false) Integer unidades,
+                                   Model modelo,
+                                   RedirectAttributes atributos) {
+        try {
+            Producto producto = inventarioServicio.registrarIngreso(idProducto, unidades);
+            atributos.addFlashAttribute("mensaje", producto.getNombre() + ": se registró el ingreso de "
+                    + textoUnidades(unidades) + ". Disponible: " + producto.getCantidadDisponible() + ".");
+            return REDIRECCION_CATALOGO;
+        } catch (DatosInvalidosException error) {
+            return mostrarCantidadConError(idProducto, modelo, error, "unidades");
+        } catch (ProductoNoEncontradoException error) {
+            return volverAlCatalogoConError(atributos, error);
+        }
+    }
+
+    // CUS07, flujo alternativo "Ajuste por conteo": reemplaza la cantidad por la que se contó en la tienda
+    @PostMapping("/productos/{idProducto}/cantidad/ajuste")
+    public String ajustarCantidad(@PathVariable int idProducto,
+                                  @RequestParam(required = false) Integer cantidad,
+                                  Model modelo,
+                                  RedirectAttributes atributos) {
+        try {
+            Producto producto = inventarioServicio.ajustarCantidad(idProducto, cantidad);
+            atributos.addFlashAttribute("mensaje", producto.getNombre()
+                    + ": la cantidad disponible se ajustó a " + producto.getCantidadDisponible() + ".");
+            return REDIRECCION_CATALOGO;
+        } catch (DatosInvalidosException error) {
+            return mostrarCantidadConError(idProducto, modelo, error, "cantidad");
+        } catch (ProductoNoEncontradoException error) {
+            return volverAlCatalogoConError(atributos, error);
+        }
+    }
+
+    private String textoUnidades(int unidades) {
+        return unidades + (unidades == 1 ? " unidad" : " unidades");
+    }
+
+    // El dato ingresado no es válido: se vuelve a mostrar el formulario y se marca el campo con error
+    private String mostrarCantidadConError(int idProducto, Model modelo, DatosInvalidosException error,
+                                           String campoConError) {
+        modelo.addAttribute("producto", productoServicio.obtenerProducto(idProducto));
+        modelo.addAttribute("error", error.getMessage());
+        modelo.addAttribute("campoConError", campoConError);
+        return VISTA_EDITAR_CANTIDAD;
     }
 
     // El precio ingresado no es válido: se vuelve a mostrar el formulario con el precio vigente

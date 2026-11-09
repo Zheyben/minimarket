@@ -12,4 +12,7 @@ public interface DetalleVentaDAO {
 
     // Devuelve los detalles de todas las ventas junto con el nombre de cada producto
     List<DetalleHistorial> listarConNombreProducto();
+
+    // Devuelve los productos y cantidades de una venta (para devolverlos al inventario al anularla)
+    List<DetalleVenta> listarPorVenta(int idVenta);
 }

@@ -12,8 +12,13 @@ public class SeguridadConfig implements WebMvcConfigurer {
     // Incluye los estilos y scripts, que la pantalla de inicio de sesión también necesita.
     private static final String[] RUTAS_PUBLICAS = {"/login", "/error", "/css/**", "/js/**"};
 
-    // Direcciones exclusivas del propietario (CUS03 y CUS06)
-    private static final String[] RUTAS_PROPIETARIO = {"/productos/*/precio", "/ventas/historial"};
+    // Direcciones exclusivas del propietario (CUS03, CUS06, CUS07 y CUS08)
+    private static final String[] RUTAS_PROPIETARIO = {
+            "/productos/*/precio",
+            "/productos/*/cantidad", "/productos/*/cantidad/*",
+            "/ventas/historial",
+            "/ventas/*/anular"
+    };
 
     private final AutenticacionInterceptor autenticacionInterceptor;
     private final PropietarioInterceptor propietarioInterceptor;

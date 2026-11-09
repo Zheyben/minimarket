@@ -11,6 +11,7 @@ import zheyben.minimarketaj.minimarket.dto.ResumenVenta;
 import zheyben.minimarketaj.minimarket.dto.VentaHistorial;
 import zheyben.minimarketaj.minimarket.excepcion.DatosInvalidosException;
 import zheyben.minimarketaj.minimarket.excepcion.StockInsuficienteException;
+import zheyben.minimarketaj.minimarket.excepcion.VentaNoAnulableException;
 import zheyben.minimarketaj.minimarket.modelo.DetalleVenta;
 import zheyben.minimarketaj.minimarket.modelo.Producto;
 import zheyben.minimarketaj.minimarket.modelo.Venta;
@@ -23,9 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// Capa de lógica de negocio: CUS04 Registrar venta y CUS06 Consultar historial de ventas
+// Capa de lógica de negocio: CUS04 Registrar venta, CUS06 Consultar historial de ventas
+// y CUS08 Anular la última venta
 @Service
 public class VentaServicio {
+
+    // Mismo largo que la columna motivoAnulacion VARCHAR(200)
+    private static final int LONGITUD_MAXIMA_MOTIVO = 200;
 
     private final ProductoServicio productoServicio;
     private final InventarioServicio inventarioServicio;
@@ -65,9 +70,49 @@ public class VentaServicio {
     // CUS06: ventas en orden cronológico con su fecha, monto y productos vendidos
     public List<VentaHistorial> listarHistorial() {
         Map<Integer, List<DetalleHistorial>> detallesPorVenta = agruparDetallesPorVenta();
+        int idUltimaVenta = obtenerIdUltimaVenta();
         return ventaDAO.listarTodas().stream()
-                .map(venta -> crearVentaHistorial(venta, detallesPorVenta))
+                .map(venta -> crearVentaHistorial(venta, detallesPorVenta, idUltimaVenta))
                 .toList();
+    }
+
+    // CUS08, pasos 1 a 3: devuelve la venta que se quiere anular, solo si es la última y sigue registrada
+    public VentaHistorial obtenerVentaParaAnular(int idVenta) {
+        Venta venta = ventaDAO.buscarPorId(idVenta).orElseThrow(VentaNoAnulableException::new);
+        VentaHistorial ventaHistorial = crearVentaHistorial(venta, agruparDetallesPorVenta(), obtenerIdUltimaVenta());
+        if (!ventaHistorial.anulable()) {
+            throw new VentaNoAnulableException();
+        }
+        return ventaHistorial;
+    }
+
+    // CUS08, pasos 4 a 6: marca la venta como anulada y devuelve sus unidades al inventario.
+    // Las dos operaciones ocurren juntas: si algo falla, la venta no se anula.
+    @Transactional
+    public void anularVenta(int idVenta, String motivo) {
+        String motivoValidado = validarMotivo(motivo);
+        LocalDateTime ahora = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        if (!ventaDAO.anular(idVenta, ahora, motivoValidado)) {
+            throw new VentaNoAnulableException();
+        }
+        inventarioServicio.devolverUnidades(detalleVentaDAO.listarPorVenta(idVenta));
+    }
+
+    private String validarMotivo(String motivo) {
+        String texto = motivo == null ? "" : motivo.trim();
+        if (texto.isEmpty()) {
+            throw new DatosInvalidosException("Escribe el motivo de la anulación.");
+        }
+        if (texto.length() > LONGITUD_MAXIMA_MOTIVO) {
+            throw new DatosInvalidosException("El motivo puede tener como máximo "
+                    + LONGITUD_MAXIMA_MOTIVO + " caracteres.");
+        }
+        return texto;
+    }
+
+    // 0 cuando todavía no hay ventas
+    private int obtenerIdUltimaVenta() {
+        return ventaDAO.buscarUltima().map(Venta::getIdVenta).orElse(0);
     }
 
     // Une las líneas repetidas de un mismo producto y valida las cantidades
@@ -152,12 +197,19 @@ public class VentaServicio {
                 .collect(Collectors.groupingBy(DetalleHistorial::idVenta));
     }
 
-    private VentaHistorial crearVentaHistorial(Venta venta, Map<Integer, List<DetalleHistorial>> detallesPorVenta) {
+    // Solo la última venta registrada se puede anular; las demás quedan como están
+    private VentaHistorial crearVentaHistorial(Venta venta, Map<Integer, List<DetalleHistorial>> detallesPorVenta,
+                                               int idUltimaVenta) {
+        boolean anulable = venta.getIdVenta() == idUltimaVenta && !venta.estaAnulada();
         return new VentaHistorial(
                 venta.getIdVenta(),
                 venta.getFechaHora(),
                 venta.getTotal(),
-                detallesPorVenta.getOrDefault(venta.getIdVenta(), List.of())
+                detallesPorVenta.getOrDefault(venta.getIdVenta(), List.of()),
+                venta.getEstado(),
+                venta.getFechaAnulacion(),
+                venta.getMotivoAnulacion(),
+                anulable
         );
     }
 }

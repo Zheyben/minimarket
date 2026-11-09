@@ -23,6 +23,10 @@ public class DetalleVentaDAOImpl implements DetalleVentaDAO {
                     + "INNER JOIN Producto p ON p.idProducto = d.idProducto "
                     + "ORDER BY d.idVenta, d.idDetalleVenta";
 
+    private static final String SQL_LISTAR_POR_VENTA =
+            "SELECT idDetalleVenta, idVenta, idProducto, cantidad, subtotal "
+                    + "FROM DetalleVenta WHERE idVenta = ? ORDER BY idDetalleVenta";
+
     private final JdbcTemplate jdbcTemplate;
 
     public DetalleVentaDAOImpl(JdbcTemplate jdbcTemplate) {
@@ -37,6 +41,22 @@ public class DetalleVentaDAOImpl implements DetalleVentaDAO {
     @Override
     public List<DetalleHistorial> listarConNombreProducto() {
         return jdbcTemplate.query(SQL_LISTAR_CON_NOMBRE_PRODUCTO, this::mapearDetalleHistorial);
+    }
+
+    @Override
+    public List<DetalleVenta> listarPorVenta(int idVenta) {
+        return jdbcTemplate.query(SQL_LISTAR_POR_VENTA, this::mapearDetalleVenta, idVenta);
+    }
+
+    // Convierte una fila de la tabla DetalleVenta en un objeto DetalleVenta
+    private DetalleVenta mapearDetalleVenta(ResultSet fila, int numeroFila) throws SQLException {
+        return new DetalleVenta(
+                fila.getInt("idDetalleVenta"),
+                fila.getInt("idVenta"),
+                fila.getInt("idProducto"),
+                fila.getInt("cantidad"),
+                fila.getBigDecimal("subtotal")
+        );
     }
 
     // Asigna los valores de un detalle a la sentencia INSERT

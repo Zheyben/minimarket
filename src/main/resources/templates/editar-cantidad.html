@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS07 Actualizar cantidades (exclusivo del propietario) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Cambiar cantidad')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('catalogo')}"></th:block>
+
+<main id="contenido" class="contenedor contenedor-estrecho" tabindex="-1">
+    <h1>Cambiar cantidad</h1>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <dl class="tarjeta datos">
+        <div>
+            <dt>Producto</dt>
+            <dd th:text="${producto.nombre}">Producto</dd>
+        </div>
+        <div>
+            <dt>Cantidad disponible</dt>
+            <dd th:text="${producto.cantidadDisponible}">0</dd>
+        </div>
+    </dl>
+
+    <!-- Flujo normal: llegó mercadería y se suman las unidades -->
+    <form method="post" class="formulario tarjeta"
+          th:action="@{/productos/{id}/cantidad/ingreso(id=${producto.idProducto})}">
+        <h2>Llegó mercadería</h2>
+        <div class="campo">
+            <label for="unidades">Unidades que llegaron</label>
+            <p id="ayuda-unidades" class="ayuda">Se suman a la cantidad disponible. Ejemplo: 12</p>
+            <input id="unidades" name="unidades" type="number"
+                   inputmode="numeric" step="1" min="1" max="999999" required
+                   th:aria-describedby="${campoConError == 'unidades'} ? 'ayuda-unidades mensaje-error' : 'ayuda-unidades'"
+                   th:aria-invalid="${campoConError == 'unidades'} ? 'true'">
+        </div>
+        <button type="submit" class="boton boton-primario boton-bloque">Sumar unidades</button>
+    </form>
+
+    <!-- Flujo alternativo: se contó el producto y la cantidad real es otra -->
+    <form method="post" class="formulario tarjeta"
+          th:action="@{/productos/{id}/cantidad/ajuste(id=${producto.idProducto})}">
+        <h2>Corregir la cantidad</h2>
+        <div class="campo">
+            <label for="cantidad">Cantidad contada en la tienda</label>
+            <p id="ayuda-cantidad" class="ayuda">Reemplaza la cantidad disponible. Úsalo después de contar el producto. Ejemplo: 25</p>
+            <input id="cantidad" name="cantidad" type="number"
+                   inputmode="numeric" step="1" min="0" max="999999" required
+                   th:aria-describedby="${campoConError == 'cantidad'} ? 'ayuda-cantidad mensaje-error' : 'ayuda-cantidad'"
+                   th:aria-invalid="${campoConError == 'cantidad'} ? 'true'">
+        </div>
+        <button type="submit" class="boton boton-secundario boton-bloque">Guardar cantidad contada</button>
+    </form>
+
+    <a th:href="@{/catalogo}" class="boton boton-secundario boton-bloque">Volver al catálogo</a>
+</main>
+</body>
+</html>

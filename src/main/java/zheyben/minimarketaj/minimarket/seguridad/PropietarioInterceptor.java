@@ -8,7 +8,8 @@ import zheyben.minimarketaj.minimarket.dto.UsuarioSesion;
 
 import java.io.IOException;
 
-// RNF02: CUS03 Actualizar precios y CUS06 Consultar historial de ventas son exclusivos del propietario.
+// RNF02: CUS03 Actualizar precios, CUS06 Consultar historial de ventas, CUS07 Actualizar cantidades
+// y CUS08 Anular la última venta son exclusivos del propietario.
 // El permiso se comprueba en el servidor, aunque alguien escriba la dirección directamente en el navegador.
 @Component
 public class PropietarioInterceptor implements HandlerInterceptor {
