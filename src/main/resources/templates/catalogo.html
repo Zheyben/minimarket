@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS02 Consultar catálogo de productos (el propietario además accede a CUS03) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Catálogo de productos')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('catalogo')}"></th:block>
+
+<main id="contenido" class="contenedor" tabindex="-1">
+    <h1>Catálogo de productos</h1>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <!-- RF03: búsqueda de productos por nombre -->
+    <form method="get" th:action="@{/catalogo}" class="buscador" role="search">
+        <label for="busqueda">Buscar producto</label>
+        <div class="buscador-fila">
+            <input id="busqueda" name="busqueda" type="search"
+                   placeholder="Ejemplo: arroz" autocomplete="off"
+                   th:value="${busqueda}">
+            <button type="submit" class="boton boton-primario">Buscar</button>
+        </div>
+    </form>
+
+    <p class="resultado-busqueda" th:if="${!#strings.isEmpty(busqueda)}">
+        Resultados para: <strong th:text="${busqueda}">texto</strong>.
+        <a th:href="@{/catalogo}">Ver todos los productos</a>
+    </p>
+
+    <p class="aviso" role="status" th:if="${sinResultados}">
+        No se encontraron productos.
+    </p>
+
+    <ul class="lista-productos" th:unless="${sinResultados}">
+        <li class="producto" th:each="producto : ${productos}">
+            <div class="producto-datos">
+                <span class="producto-nombre" th:text="${producto.nombre}">Producto</span>
+                <span class="producto-stock">
+                    Disponible: <span th:text="${producto.cantidadDisponible}">0</span>
+                </span>
+            </div>
+            <p class="producto-precio">
+                <span class="solo-lector">Precio:</span>
+                <span th:replace="~{fragmentos/plantilla :: soles(${producto.precio})}"></span>
+            </p>
+            <!-- CUS03: solo el propietario ve esta opción -->
+            <a class="boton boton-secundario producto-accion"
+               th:if="${usuarioActual?.esPropietario()}"
+               th:href="@{/productos/{id}/precio(id=${producto.idProducto})}"
+               th:aria-label="|Cambiar precio de ${producto.nombre}|">Cambiar precio</a>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

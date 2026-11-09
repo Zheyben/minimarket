@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS01 Autenticarse en el sistema -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Iniciar sesión')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('')}"></th:block>
+
+<main id="contenido" class="contenedor contenedor-estrecho" tabindex="-1">
+    <h1>Iniciar sesión</h1>
+    <p>Ingresa con tu usuario de vendedor o de propietario.</p>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <form method="post" th:action="@{/login}" class="formulario">
+        <div class="campo">
+            <label for="nombreUsuario">Usuario</label>
+            <input id="nombreUsuario" name="nombreUsuario" type="text"
+                   autocomplete="username" autocapitalize="none" spellcheck="false" required
+                   th:value="${nombreUsuario}"
+                   th:aria-invalid="${error} ? 'true'"
+                   th:aria-describedby="${error} ? 'mensaje-error'">
+        </div>
+
+        <div class="campo">
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" name="contrasena" type="password"
+                   autocomplete="current-password" required
+                   th:aria-invalid="${error} ? 'true'"
+                   th:aria-describedby="${error} ? 'mensaje-error'">
+        </div>
+
+        <button type="submit" class="boton boton-primario boton-bloque">Ingresar</button>
+    </form>
+</main>
+</body>
+</html>

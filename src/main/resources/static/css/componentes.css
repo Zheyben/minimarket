@@ -1,0 +1,712 @@
+/*
+ * Minimarket A&J - Componentes reutilizables
+ * Cabecera, menú, botones, formularios, mensajes, listas y tablas.
+ * Diseño pensado primero para el celular (RNF01); en pantallas grandes se amplía.
+ */
+
+/* ---------- Cabecera y menú ---------- */
+
+/* Íconos SVG: toman el color del texto que los rodea */
+.icono {
+    width: 1.5em;
+    height: 1.5em;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Íconos rellenos (Google Material Symbols) */
+.icono-relleno {
+    fill: currentColor;
+    stroke: none;
+}
+
+.cabecera {
+    background: var(--color-principal);
+    color: var(--color-texto-claro);
+}
+
+.cabecera-barra {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 0.75rem var(--espacio);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.cabecera-marca {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.cabecera-marca span {
+    white-space: nowrap;
+}
+
+.cabecera-marca .icono {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--color-acento);
+}
+
+.cabecera-usuario {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.cabecera-sesion {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.etiqueta-rol {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 6px;
+    background: var(--color-acento);
+    color: var(--color-texto);
+    font-size: var(--texto-pequeno);
+    font-weight: 700;
+}
+
+/* En el celular el nombre de usuario, el rol completo y el texto "Cerrar sesión"
+   solo los leen los lectores de pantalla, para que el nombre de la tienda quepa en una línea */
+.cabecera-nombre,
+.rol-completo,
+.boton-cabecera-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* Menú inferior fijo (celular): opciones grandes al alcance del pulgar */
+.menu {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    background: var(--color-fondo);
+    border-top: 3px solid var(--color-principal);
+}
+
+.menu ul {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    display: flex;
+}
+
+.menu li {
+    flex: 1;
+}
+
+.menu a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    min-height: 4rem;
+    padding: 0.25rem;
+    color: var(--color-principal);
+    font-size: var(--texto-pequeno);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.menu a .icono {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.menu a:hover {
+    background: var(--color-fondo-suave);
+}
+
+/* Opción de la página actual: se distingue por el color y por el subrayado, no solo por el color */
+.menu a[aria-current="page"] {
+    background: var(--color-acento);
+    color: var(--color-texto);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* Mientras se escribe en un campo, el menú inferior se oculta para no tapar el teclado ni la lista */
+@media (max-width: 47.99rem) {
+    body:has(input:focus, select:focus) .menu {
+        display: none;
+    }
+}
+
+/* ---------- Botones ---------- */
+
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--alto-control);
+    padding: 0 1.25rem;
+    border: var(--grosor-borde) solid var(--color-principal);
+    border-radius: var(--radio);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.boton-primario {
+    background: var(--color-principal);
+    color: var(--color-texto-claro);
+}
+
+.boton-primario:hover {
+    background: var(--color-principal-hover);
+}
+
+.boton-secundario {
+    background: var(--color-fondo);
+    color: var(--color-principal);
+}
+
+.boton-secundario:hover {
+    background: var(--color-fondo-suave);
+}
+
+.boton-cabecera {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: 0 0.5rem;
+    gap: 0.5rem;
+    background: transparent;
+    border-color: var(--color-texto-claro);
+    color: var(--color-texto-claro);
+}
+
+.boton-cabecera:hover {
+    background: var(--color-principal-hover);
+}
+
+.boton-quitar {
+    background: var(--color-fondo);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.boton-bloque {
+    width: 100%;
+}
+
+.acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+/* ---------- Formularios ---------- */
+
+.formulario {
+    margin-bottom: 1.5rem;
+}
+
+.campo {
+    margin-bottom: 1.25rem;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 700;
+}
+
+.ayuda {
+    font-size: var(--texto-pequeno);
+    color: var(--color-texto-secundario);
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+select {
+    width: 100%;
+    min-height: var(--alto-control);
+    padding: 0 0.875rem;
+    border: var(--grosor-borde) solid var(--color-texto);
+    border-radius: var(--radio);
+    background: var(--color-fondo);
+    color: var(--color-texto);
+    font: inherit;
+}
+
+input[aria-invalid="true"] {
+    border-color: var(--color-error);
+    border-width: 3px;
+}
+
+.grupo {
+    margin: 0 0 1.5rem;
+    padding: 0;
+    border: 0;
+}
+
+.grupo legend {
+    margin-bottom: 0.5rem;
+    font-size: var(--texto-subtitulo);
+    font-weight: 700;
+}
+
+/* Buscador del catálogo */
+.buscador {
+    margin-bottom: 1.25rem;
+}
+
+.buscador label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 700;
+}
+
+.buscador-fila {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.buscador-fila input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Filas del registro de venta */
+.lineas-venta {
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+}
+
+.linea-venta {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+}
+
+.linea-venta .campo:last-of-type {
+    margin-bottom: 0;
+}
+
+.linea-venta .boton-quitar {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Buscador de productos de la venta (buscador-producto.js) */
+.combo {
+    position: relative;
+}
+
+.combo-icono {
+    position: absolute;
+    left: 0.875rem;
+    top: calc(var(--alto-control) / 2);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.combo .combo-campo {
+    padding-left: 3rem;
+}
+
+.combo-campo[aria-expanded="true"] {
+    border-radius: var(--radio) var(--radio) 0 0;
+}
+
+.combo-lista,
+.combo-vacio {
+    margin: 0;
+    border: var(--grosor-borde) solid var(--color-texto);
+    border-top: 0;
+    border-radius: 0 0 var(--radio) var(--radio);
+    background: var(--color-fondo);
+}
+
+.combo-lista {
+    padding: 0;
+    list-style: none;
+    max-height: 18rem;
+    overflow-y: auto;
+}
+
+.combo-opcion {
+    display: flex;
+    align-items: center;
+    min-height: 3.25rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.combo-opcion + .combo-opcion {
+    border-top: 1px solid var(--color-borde);
+}
+
+.combo-opcion:hover,
+.combo-opcion[aria-selected="true"] {
+    background: var(--color-principal);
+    color: var(--color-texto-claro);
+}
+
+/* Parte del nombre que coincide con lo escrito: en negrita y subrayada */
+.combo-opcion mark {
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.combo-vacio {
+    padding: 0.875rem 1rem;
+    color: var(--color-texto-secundario);
+}
+
+.combo-campo[aria-invalid="true"] {
+    border-color: var(--color-error);
+    border-width: 3px;
+}
+
+/* Precio y disponibilidad del producto elegido */
+.producto-elegido {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.producto-elegido p {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radio);
+    background: var(--color-fondo-suave);
+}
+
+.producto-elegido-etiqueta {
+    display: block;
+    font-size: var(--texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.producto-elegido-valor {
+    font-size: 1.375rem;
+    font-weight: 700;
+}
+
+.error-campo {
+    margin: 0.5rem 0 0;
+    color: var(--color-error);
+    font-size: var(--texto-pequeno);
+}
+
+/* ---------- Mensajes ---------- */
+
+.alerta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border: var(--grosor-borde) solid;
+    border-left-width: 8px;
+    border-radius: 0;
+}
+
+.alerta-icono {
+    font-weight: 700;
+}
+
+.alerta-exito {
+    background: var(--color-exito-fondo);
+    border-color: var(--color-exito);
+    color: var(--color-exito);
+}
+
+.alerta-error {
+    background: var(--color-error-fondo);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.aviso {
+    padding: 1rem;
+    background: var(--color-fondo-suave);
+    border: var(--grosor-borde) dashed var(--color-borde);
+}
+
+.resultado-busqueda {
+    color: var(--color-texto-secundario);
+}
+
+/* ---------- Tarjetas y datos ---------- */
+
+.tarjeta {
+    padding: 1rem;
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+    margin-bottom: 1.5rem;
+}
+
+.datos {
+    margin-top: 0;
+}
+
+.datos div + div {
+    margin-top: 0.75rem;
+}
+
+.datos dt {
+    font-size: var(--texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.datos dd {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ---------- Catálogo ---------- */
+
+.lista-productos {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+}
+
+.producto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 1rem;
+}
+
+.producto + .producto {
+    border-top: var(--grosor-borde) solid var(--color-borde);
+}
+
+.producto-datos {
+    display: flex;
+    flex-direction: column;
+}
+
+.producto-nombre {
+    font-weight: 700;
+}
+
+.producto-stock {
+    font-size: var(--texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.producto-precio {
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: 700;
+    white-space: nowrap;
+    /* Cifras del mismo ancho para que los precios queden alineados */
+    font-variant-numeric: tabular-nums;
+}
+
+.producto-accion {
+    width: 100%;
+}
+
+/* ---------- Tablas (confirmación e historial) ---------- */
+
+.tabla-contenedor {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: var(--grosor-borde) solid var(--color-borde);
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla thead th {
+    background: var(--color-principal);
+    color: var(--color-texto-claro);
+}
+
+.precio-unitario {
+    display: block;
+    font-size: var(--texto-pequeno);
+    font-style: italic;
+    color: var(--color-texto-tenue);
+}
+
+.tabla .numero {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-principal);
+    color: var(--color-texto-claro);
+    border-radius: var(--radio);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.total-pequeno {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+}
+
+/* ---------- Historial ---------- */
+
+.lista-ventas {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* ---------- Pantallas más anchas (tablet o computadora) ---------- */
+
+@media (min-width: 40rem) {
+    /* Nombre, precio y botón en columnas: el precio queda en la misma posición en todas las filas */
+    .producto {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 7rem auto;
+    }
+
+    .producto-precio {
+        text-align: right;
+    }
+
+    .producto-accion {
+        width: auto;
+    }
+
+    .acciones {
+        flex-direction: row;
+    }
+
+    .acciones > * {
+        flex: 1;
+    }
+
+    .linea-venta {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 10rem;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .linea-venta .campo {
+        margin-bottom: 0;
+    }
+
+    .linea-venta .boton-quitar {
+        grid-column: 1 / -1;
+        justify-self: end;
+        margin-top: 0;
+        width: auto;
+    }
+}
+
+/* En computadora el menú pasa a la cabecera y se muestran el usuario y el texto "Cerrar sesión" */
+@media (min-width: 48rem) {
+    .rol-corto {
+        display: none;
+    }
+
+    .cabecera-nombre,
+    .rol-completo,
+    .boton-cabecera-texto {
+        position: static;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        clip: auto;
+    }
+
+    .cabecera-barra {
+        flex-wrap: wrap;
+    }
+
+    /* El menú ocupa una segunda fila de la barra, debajo de la tienda y el usuario */
+    .menu {
+        position: static;
+        order: 3;
+        flex-basis: 100%;
+        background: transparent;
+        border-top: 0;
+    }
+
+    .menu ul {
+        gap: 0.5rem;
+    }
+
+    .menu li {
+        flex: 0 1 auto;
+    }
+
+    .menu a {
+        flex-direction: row;
+        gap: 0.5rem;
+        min-height: 3rem;
+        padding: 0 1rem;
+        border: var(--grosor-borde) solid var(--color-texto-claro);
+        border-radius: var(--radio);
+        color: var(--color-texto-claro);
+    }
+
+    .menu a .icono {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .menu a:hover {
+        background: var(--color-principal-hover);
+    }
+
+    .menu a[aria-current="page"] {
+        border-color: var(--color-acento);
+    }
+}

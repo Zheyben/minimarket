@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS04 Registrar venta, pasos 1 a 3 (selección de productos y cantidades) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Registrar venta')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('venta')}"></th:block>
+
+<main id="contenido" class="contenedor" tabindex="-1">
+    <h1>Registrar venta</h1>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <p class="aviso" id="aviso-borrador" role="status" hidden>
+        Se recuperó la venta que estabas registrando.
+    </p>
+
+    <form method="post" th:action="@{/ventas/calcular}" class="formulario"
+          th:data-usuario="${usuarioActual.nombreUsuario}">
+        <fieldset class="grupo">
+            <legend>Productos de la venta</legend>
+            <p class="ayuda">Elige cada producto y escribe la cantidad que lleva el cliente.</p>
+
+            <ol id="lineas-venta" class="lineas-venta">
+                <!-- Si la venta volvió con un error, se conservan los productos que el actor eligió -->
+                <th:block th:each="linea, estado : ${venta.lineas}">
+                    <li th:replace="~{fragmentos/venta :: linea(${estado.index}, ${linea})}"></li>
+                </th:block>
+                <th:block th:if="${#lists.isEmpty(venta.lineas)}">
+                    <li th:replace="~{fragmentos/venta :: linea(0, null)}"></li>
+                </th:block>
+            </ol>
+
+            <!-- Se muestra solo con JavaScript (registrar-venta.js) -->
+            <button type="button" id="agregar-linea" class="boton boton-secundario boton-bloque" hidden>
+                + Agregar otro producto
+            </button>
+            <p id="anuncio-lineas" class="solo-lector" aria-live="polite"></p>
+        </fieldset>
+
+        <button type="submit" class="boton boton-primario boton-bloque">Calcular total</button>
+    </form>
+
+    <!-- Modelo de fila vacía que registrar-venta.js copia al pulsar "Agregar otro producto" -->
+    <template id="plantilla-linea">
+        <li th:replace="~{fragmentos/venta :: linea(0, null)}"></li>
+    </template>
+</main>
+
+<script th:src="@{/js/borrador-venta.js}" defer></script>
+<script th:src="@{/js/buscador-producto.js}" defer></script>
+<script th:src="@{/js/registrar-venta.js}" defer></script>
+</body>
+</html>

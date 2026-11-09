@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS04 Registrar venta, pasos 4 a 6 (subtotales, total y confirmación del pago) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Confirmar venta')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('venta')}"></th:block>
+
+<main id="contenido" class="contenedor" tabindex="-1">
+    <h1>Confirmar venta</h1>
+    <p>Revisa los productos y verifica el pago del cliente antes de confirmar.</p>
+
+    <div class="tabla-contenedor">
+        <table class="tabla">
+            <caption class="solo-lector">Detalle de la venta</caption>
+            <thead>
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col" class="numero">Cantidad</th>
+                <th scope="col" class="numero">Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="detalle : ${resumen.detalles}">
+                <td>
+                    <span th:text="${detalle.nombreProducto}">Producto</span>
+                    <span class="precio-unitario">
+                        <span th:replace="~{fragmentos/plantilla :: soles(${detalle.precioUnitario})}"></span> c/u
+                    </span>
+                </td>
+                <td class="numero" th:text="${detalle.cantidad}">1</td>
+                <td class="numero">
+                    <span th:replace="~{fragmentos/plantilla :: soles(${detalle.subtotal})}"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="total">
+        <span>Total a cobrar</span>
+        <span th:replace="~{fragmentos/plantilla :: soles(${resumen.total})}"></span>
+    </p>
+
+    <div class="acciones">
+        <!-- Se reenvían los productos y cantidades; el servidor vuelve a calcular con los precios de la base de datos -->
+        <form method="post" th:action="@{/ventas/registrar}"
+              data-borrar-borrador th:data-usuario="${usuarioActual.nombreUsuario}">
+            <th:block th:each="detalle, estado : ${resumen.detalles}">
+                <input type="hidden" th:name="|lineas[${estado.index}].idProducto|" th:value="${detalle.idProducto}">
+                <input type="hidden" th:name="|lineas[${estado.index}].cantidad|" th:value="${detalle.cantidad}">
+            </th:block>
+            <button type="submit" class="boton boton-primario boton-bloque">Confirmar venta</button>
+        </form>
+
+        <!-- CUS04, flujo alternativo "Venta no confirmada" -->
+        <form method="post" th:action="@{/ventas/cancelar}"
+              data-borrar-borrador th:data-usuario="${usuarioActual.nombreUsuario}">
+            <button type="submit" class="boton boton-secundario boton-bloque">Cancelar venta</button>
+        </form>
+    </div>
+</main>
+
+<script th:src="@{/js/borrador-venta.js}" defer></script>
+</body>
+</html>

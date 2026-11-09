@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+    Vista de errores. Spring Boot la usa automáticamente (por ejemplo, cuando un vendedor
+    intenta abrir una función exclusiva del propietario: error 403).
+-->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Aviso')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('')}"></th:block>
+
+<main id="contenido" class="contenedor contenedor-estrecho" tabindex="-1">
+    <th:block th:switch="${status}">
+        <th:block th:case="403">
+            <h1>Acceso no permitido</h1>
+            <p class="alerta alerta-error" role="alert">
+                <span class="alerta-icono" aria-hidden="true">&#10006;</span>
+                <span><strong>Error:</strong> esta función es exclusiva del propietario.</span>
+            </p>
+        </th:block>
+        <th:block th:case="404">
+            <h1>Página no encontrada</h1>
+            <p class="alerta alerta-error" role="alert">
+                <span class="alerta-icono" aria-hidden="true">&#10006;</span>
+                <span><strong>Error:</strong> la dirección que abriste no existe.</span>
+            </p>
+        </th:block>
+        <th:block th:case="*">
+            <h1>Ocurrió un problema</h1>
+            <p class="alerta alerta-error" role="alert">
+                <span class="alerta-icono" aria-hidden="true">&#10006;</span>
+                <span><strong>Error:</strong> no se pudo completar la operación. Inténtalo nuevamente.</span>
+            </p>
+        </th:block>
+    </th:block>
+
+    <a th:href="@{/catalogo}" class="boton boton-primario boton-bloque">Volver al catálogo</a>
+</main>
+</body>
+</html>

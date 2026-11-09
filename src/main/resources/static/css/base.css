@@ -1,0 +1,145 @@
+/*
+ * Minimarket A&J - Estilos base (propuesta de diseño "Alto contraste")
+ * Variables de diseño, estilos generales y utilidades de accesibilidad.
+ * Para cambiar un color o un tamaño en todo el sistema, se modifica solo su variable.
+ */
+
+:root {
+    /* Colores (contraste según WCAG 2.1 nivel AA o superior) */
+    --color-principal: #0B2545;        /* azul marino: cabecera y botones principales */
+    --color-principal-hover: #13386B;
+    --color-acento: #FFD23F;           /* amarillo: rol, opción activa y borde de foco */
+    --color-texto: #000000;
+    --color-texto-secundario: #2B2B2B;
+    --color-texto-tenue: #595959;      /* gris para datos de apoyo (contraste 7:1 sobre blanco) */
+    --color-texto-claro: #FFFFFF;
+    --color-fondo: #FFFFFF;
+    --color-fondo-suave: #F1F4F8;
+    --color-borde: #0B2545;
+    --color-error: #A4161A;
+    --color-error-fondo: #FDECEC;
+    --color-exito: #1B5E20;
+    --color-exito-fondo: #E8F5E9;
+
+    /* Tipografía: letra grande y legible (en rem para respetar el zoom del celular) */
+    --fuente: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --texto-base: 1.125rem;            /* 18 px */
+    --texto-pequeno: 1rem;             /* 16 px */
+    --texto-titulo: 1.75rem;           /* 28 px */
+    --texto-subtitulo: 1.375rem;       /* 22 px */
+
+    /* Medidas */
+    --alto-control: 3.25rem;           /* 52 px: botones y campos fáciles de tocar */
+    --grosor-borde: 2px;
+    --radio: 10px;
+    --espacio: 1rem;
+    --ancho-maximo: 48rem;
+    --ancho-estrecho: 30rem;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--fuente);
+    font-size: var(--texto-base);
+    line-height: 1.5;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+}
+
+h1,
+h2 {
+    line-height: 1.25;
+    margin: 0 0 var(--espacio);
+}
+
+h1 {
+    font-size: var(--texto-titulo);
+}
+
+h2 {
+    font-size: var(--texto-subtitulo);
+}
+
+p {
+    margin: 0 0 var(--espacio);
+}
+
+a {
+    color: var(--color-principal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Foco visible para quien usa solo el teclado: amarillo con un anillo negro alrededor */
+:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 0;
+    box-shadow: 0 0 0 6px var(--color-texto);
+}
+
+main:focus {
+    outline: none;
+}
+
+/* Contenido que solo leen los lectores de pantalla */
+.solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Enlace "Saltar al contenido": aparece al recibir el foco con la tecla Tab */
+.saltar-contenido {
+    position: absolute;
+    left: var(--espacio);
+    top: -10rem;
+    z-index: 10;
+    padding: 0.75rem 1rem;
+    background: var(--color-acento);
+    color: var(--color-texto);
+    font-weight: 700;
+}
+
+.saltar-contenido:focus {
+    top: var(--espacio);
+}
+
+/* Contenedores de página */
+/* En el celular se deja espacio abajo para que el menú inferior no tape el contenido */
+.contenedor {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 1.5rem var(--espacio) 6rem;
+}
+
+@media (min-width: 48rem) {
+    .contenedor {
+        padding-bottom: 3rem;
+    }
+}
+
+.contenedor-estrecho {
+    max-width: var(--ancho-estrecho);
+}
+
+.texto-secundario {
+    display: block;
+    font-size: var(--texto-pequeno);
+    color: var(--color-texto-secundario);
+}

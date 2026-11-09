@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!--
+    Piezas compartidas por todas las pantallas (se reutilizan con th:replace).
+    Un cambio aquí se aplica a todo el sistema.
+-->
+
+<!-- Encabezado del documento: título de la pestaña y hojas de estilo -->
+<head th:fragment="cabeza(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${titulo} - Minimarket A&amp;J|">Minimarket A&amp;J</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/componentes.css}">
+</head>
+
+<body>
+
+<!--
+    Cabecera: enlace para saltar al contenido, nombre de la tienda, rol del usuario,
+    botón para cerrar sesión y menú.
+    En el celular el menú queda fijo en la parte inferior (al alcance del pulgar);
+    en pantallas grandes pasa a la barra superior (ver componentes.css).
+    El menú solo muestra las funciones que el rol puede usar; el permiso real
+    se comprueba en el servidor (RNF02).
+    paginaActual: catalogo | venta | historial (marca la opción activa del menú)
+-->
+<th:block th:fragment="cabecera(paginaActual)">
+    <a class="saltar-contenido" href="#contenido">Saltar al contenido</a>
+
+    <header class="cabecera">
+        <div class="cabecera-barra">
+            <p class="cabecera-marca">
+                <svg th:replace="~{fragmentos/iconos :: tienda}"></svg>
+                <span>Minimarket A&amp;J</span>
+            </p>
+
+            <nav class="menu" th:if="${usuarioActual != null}" aria-label="Menú principal">
+                <ul>
+                    <li>
+                        <a th:href="@{/catalogo}"
+                           th:aria-current="${paginaActual == 'catalogo'} ? 'page'">
+                            <svg th:replace="~{fragmentos/iconos :: catalogo}"></svg>
+                            <span>Catálogo</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ventas/nueva}"
+                           th:aria-current="${paginaActual == 'venta'} ? 'page'">
+                            <svg th:replace="~{fragmentos/iconos :: vender}"></svg>
+                            <span>Vender</span>
+                        </a>
+                    </li>
+                    <li th:if="${usuarioActual.esPropietario()}">
+                        <a th:href="@{/ventas/historial}"
+                           th:aria-current="${paginaActual == 'historial'} ? 'page'">
+                            <svg th:replace="~{fragmentos/iconos :: historial}"></svg>
+                            <span>Historial</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="cabecera-usuario" th:if="${usuarioActual != null}">
+                <p class="cabecera-sesion">
+                    <span class="solo-lector">Sesión iniciada como</span>
+                    <span class="cabecera-nombre" th:text="${usuarioActual.nombreUsuario}">usuario</span>
+                    <!-- En el celular se ve solo la inicial (P o V); el lector de pantalla siempre lee el rol completo -->
+                    <span class="etiqueta-rol">
+                        <span class="rol-corto" aria-hidden="true"
+                              th:text="${usuarioActual.esPropietario()} ? 'P' : 'V'">R</span>
+                        <span class="rol-completo"
+                              th:text="${usuarioActual.esPropietario()} ? 'Propietario' : 'Vendedor'">Rol</span>
+                    </span>
+                </p>
+                <form method="post" th:action="@{/logout}">
+                    <button type="submit" class="boton boton-cabecera">
+                        <svg th:replace="~{fragmentos/iconos :: salir}"></svg>
+                        <span class="boton-cabecera-texto">Cerrar sesión</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+</th:block>
+
+<!--
+    Mensajes para el usuario. Se escriben con palabras ("Listo" / "Error") además del color,
+    y los lectores de pantalla los anuncian automáticamente (role="status" / role="alert").
+-->
+<th:block th:fragment="mensajes">
+    <p class="alerta alerta-exito" role="status" th:if="${mensaje}">
+        <span class="alerta-icono" aria-hidden="true">&#10004;</span>
+        <span><strong>Listo:</strong> <span th:text="${mensaje}">Mensaje</span></span>
+    </p>
+    <p class="alerta alerta-error" role="alert" id="mensaje-error" th:if="${error}">
+        <span class="alerta-icono" aria-hidden="true">&#10006;</span>
+        <span><strong>Error:</strong> <span th:text="${error}">Error</span></span>
+    </p>
+</th:block>
+
+<!-- Monto en soles con formato peruano: S/ 1,234.50 -->
+<span th:fragment="soles(monto)" class="monto"
+      th:text="|S/ ${#numbers.formatDecimal(monto, 1, 'COMMA', 2, 'POINT')}|">S/ 0.00</span>
+
+</body>
+</html>

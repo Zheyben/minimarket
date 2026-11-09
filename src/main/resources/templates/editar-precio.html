@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS03 Actualizar precios de productos (exclusivo del propietario) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Cambiar precio')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('catalogo')}"></th:block>
+
+<main id="contenido" class="contenedor contenedor-estrecho" tabindex="-1">
+    <h1>Cambiar precio</h1>
+
+    <th:block th:replace="~{fragmentos/plantilla :: mensajes}"></th:block>
+
+    <dl class="tarjeta datos">
+        <div>
+            <dt>Producto</dt>
+            <dd th:text="${producto.nombre}">Producto</dd>
+        </div>
+        <div>
+            <dt>Precio actual</dt>
+            <dd><span th:replace="~{fragmentos/plantilla :: soles(${producto.precio})}"></span></dd>
+        </div>
+    </dl>
+
+    <form method="post" class="formulario"
+          th:action="@{/productos/{id}/precio(id=${producto.idProducto})}">
+        <div class="campo">
+            <label for="nuevoPrecio">Nuevo precio (S/)</label>
+            <p id="ayuda-precio" class="ayuda">Debe ser mayor que 0 y tener como máximo 2 decimales. Ejemplo: 4.80</p>
+            <input id="nuevoPrecio" name="nuevoPrecio" type="number"
+                   inputmode="decimal" step="0.01" min="0.01" max="99999999.99" required
+                   th:aria-describedby="${error} ? 'ayuda-precio mensaje-error' : 'ayuda-precio'"
+                   th:aria-invalid="${error} ? 'true'">
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="boton boton-primario">Guardar precio</button>
+            <a th:href="@{/catalogo}" class="boton boton-secundario">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Vista: CUS06 Consultar historial de ventas (exclusivo del propietario) -->
+<head th:replace="~{fragmentos/plantilla :: cabeza('Historial de ventas')}"></head>
+<body>
+<th:block th:replace="~{fragmentos/plantilla :: cabecera('historial')}"></th:block>
+
+<main id="contenido" class="contenedor" tabindex="-1">
+    <h1>Historial de ventas</h1>
+
+    <p class="aviso" th:if="${#lists.isEmpty(ventas)}">Todavía no hay ventas registradas.</p>
+
+    <ul class="lista-ventas" th:unless="${#lists.isEmpty(ventas)}">
+        <li class="tarjeta venta" th:each="venta : ${ventas}">
+            <h2>Venta N.° <span th:text="${venta.idVenta}">1</span></h2>
+            <p class="texto-secundario">
+                Fecha y hora:
+                <time th:datetime="${venta.fechaHora}"
+                      th:text="${#temporals.format(venta.fechaHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</time>
+            </p>
+
+            <div class="tabla-contenedor">
+                <table class="tabla">
+                    <caption class="solo-lector" th:text="|Productos de la venta ${venta.idVenta}|">Productos</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col" class="numero">Cantidad</th>
+                        <th scope="col" class="numero">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="detalle : ${venta.productos}">
+                        <td th:text="${detalle.nombreProducto}">Producto</td>
+                        <td class="numero" th:text="${detalle.cantidad}">1</td>
+                        <td class="numero">
+                            <span th:replace="~{fragmentos/plantilla :: soles(${detalle.subtotal})}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="total total-pequeno">
+                <span>Total</span>
+                <span th:replace="~{fragmentos/plantilla :: soles(${venta.total})}"></span>
+            </p>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

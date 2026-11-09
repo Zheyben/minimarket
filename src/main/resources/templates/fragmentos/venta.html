@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+    Una fila del formulario de venta (CUS04): producto y cantidad.
+    indice: posición de la fila (0, 1, 2...), con la que el servidor arma la lista lineas[i].
+    linea: lo que el actor ya había elegido (o null si la fila es nueva).
+
+    La lista desplegable (select) es la que se envía al servidor. buscador-producto.js la oculta
+    y en su lugar muestra un campo donde se escribe el nombre del producto; al elegirlo,
+    se muestran el precio y la disponibilidad (datos data-precio y data-disponible).
+    Los atributos data-campo, data-id y data-para los usa registrar-venta.js para renumerar las filas.
+-->
+<li th:fragment="linea(indice, linea)" class="linea-venta">
+    <div class="campo campo-producto">
+        <label data-para="idProducto" th:for="|idProducto-${indice}|">
+            Producto <span class="linea-numero" th:text="${indice + 1}">1</span>
+        </label>
+        <select data-campo="idProducto" data-id="idProducto" required
+                th:id="|idProducto-${indice}|"
+                th:name="|lineas[${indice}].idProducto|">
+            <option value="">Elige un producto</option>
+            <option th:each="producto : ${productos}"
+                    th:value="${producto.idProducto}"
+                    th:selected="${linea != null and linea.idProducto == producto.idProducto}"
+                    th:data-precio="${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"
+                    th:data-disponible="${producto.cantidadDisponible}"
+                    th:text="${producto.nombre}">Producto</option>
+        </select>
+
+        <p class="error-campo" data-id="error" hidden th:id="|error-${indice}|">
+            <span aria-hidden="true">&#10006;</span>
+            <strong>Error:</strong> elige un producto de la lista.
+        </p>
+
+        <div class="producto-elegido" data-info hidden>
+            <p>
+                <span class="producto-elegido-etiqueta">Precio</span>
+                <span class="producto-elegido-valor" data-valor="precio"></span>
+            </p>
+            <p>
+                <span class="producto-elegido-etiqueta">Disponible</span>
+                <span class="producto-elegido-valor" data-valor="disponible"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="campo campo-cantidad">
+        <label data-para="cantidad" th:for="|cantidad-${indice}|">
+            Cantidad<span class="solo-lector"> del producto <span class="linea-numero" th:text="${indice + 1}">1</span></span>
+        </label>
+        <input data-campo="cantidad" data-id="cantidad" type="number" inputmode="numeric" min="1" step="1" required
+               th:id="|cantidad-${indice}|"
+               th:name="|lineas[${indice}].cantidad|"
+               th:value="${linea?.cantidad}">
+    </div>
+
+    <!-- Se muestra solo con JavaScript y cuando hay más de una fila -->
+    <button type="button" class="boton boton-quitar" data-accion="quitar" hidden
+            th:aria-label="|Quitar producto ${indice + 1}|">Quitar</button>
+</li>
+
+</body>
+</html>
